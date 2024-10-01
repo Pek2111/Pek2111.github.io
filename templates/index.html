@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice Assistant</title>
+    <script>
+        function startRecording() {
+            fetch('/start-recording', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'recording') {
+                    document.getElementById('status').innerText = 'Recording...';
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        function stopRecording() {
+            fetch('/stop-recording', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('response').innerText = 'AI Response: ' + data.response;
+                    playAudio(data.audio);
+                } else if (data.status === 'failed') {
+                    document.getElementById('response').innerText = data.message;
+                }
+                document.getElementById('status').innerText = '';  // Clear status after stopping
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        function processText() {
+            const userInput = document.getElementById('userText').value;
+            
+            fetch('/process-text', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: userInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('response').innerText = 'AI Response: ' + data.response;
+                    playAudio(data.audio);
+                } else {
+                    document.getElementById('response').innerText = data.message;
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        function playAudio(audioPath) {
+            const audio = document.getElementById('audioPlayer');
+            audio.src = '/' + audioPath;
+            audio.play();
+        }
+    </script>
+</head>
+<body>
+    <h1>AI Voice Assistant</h1>
+
+    <!-- Voice input section -->
+    <button onclick="startRecording()">Start Recording</button>
+    <button onclick="stopRecording()">Stop Recording</button>
+    <p id="status"></p>  <!-- This will display recording status -->
+
+    <!-- Text input section -->
+    <input type="text" id="userText" placeholder="Type your question here">
+    <button onclick="processText()">Submit Text</button>
+
+    <!-- Display the AI response -->
+    <p id="response"></p> <!-- The AI response will be displayed here -->
+
+    <!-- Audio playback -->
+    <audio id="audioPlayer" controls style="display: none;"></audio> <!-- Hidden initially -->
+</body>
+</html>
