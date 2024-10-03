@@ -100,23 +100,16 @@ def start_record():
 def stop_record():
     user_input = stop_recording()
     
-    # Process only if "friday" is mentioned
-    if "friday" in user_input:
-        response_text = ai_response(user_input)
-        return jsonify({'status': 'success', 'response': response_text, 'audio': audio_file})
-    else:
-        return jsonify({'status': 'failed', 'message': 'Keyword "friday" not mentioned.'})
+    response_text = ai_response(user_input)
+    return jsonify({'status': 'success', 'response': response_text, 'audio': audio_file})
 
 # Flask route to process user text input
 @app.route('/process-text', methods=['POST'])
 def process_text():
     user_input = request.json.get('text')
 
-    if "friday" in user_input.lower():
-        response_text = ai_response(user_input)
-        return jsonify({'status': 'success', 'response': response_text, 'audio': audio_file})
-    else:
-        return jsonify({'status': 'failed', 'message': 'Keyword "friday" not mentioned.'})
+    response_text = ai_response(user_input)
+    return jsonify({'status': 'success', 'response': response_text, 'audio': audio_file})
 
 # Flask route to serve the audio file
 @app.route('/get-audio')
